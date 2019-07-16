@@ -24,7 +24,7 @@
   "scripts": {
     "build": "rm -rfv dist/ && npx tsc",
     "lint": "npx tslint src/**/*.ts",
-    "test": "jest"
+    "test": "NODE_ENV=test jest"
   },
   "repository": {
     "type": "git",
