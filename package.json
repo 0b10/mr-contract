@@ -1,0 +1,45 @@
+{
+  "name": "mr-contract",
+  "version": "0.0.1",
+  "description": "Javascript DbC based on experimental decorators",
+  "main": "dist/index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.4",
+    "@babel/parser": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "@babel/plugin-proposal-numeric-separator": "^7.2.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.4",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-typescript": "^7.3.3",
+    "@babel/types": "^7.5.0",
+    "babel-jest": "^24.8.0",
+    "chai": "^4.2.0",
+    "jest": "^24.8.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "scripts": {
+    "build": "rm -rfv dist/ && npx tsc",
+    "lint": "npx tslint src/**/*.ts",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0b10/mr-contract.git"
+  },
+  "keywords": [
+    "dbc",
+    "contract",
+    "assertion",
+    "defensive"
+  ],
+  "author": "0b10",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/0b10/mr-contract/issues"
+  },
+  "homepage": "https://github.com/0b10/mr-contract#readme"
+}
