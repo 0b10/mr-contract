@@ -34,7 +34,11 @@ export class MethodContracts {
       const wrapped = descriptor.value;
 
       descriptor.value = (...args: any[]) => {
+        const contracts: IContract = this.contracts[contractKey];
+
+        contracts.pre.forEach((contract) => contract());
         const result = wrapped.apply(this, args);
+
         return result;
       };
 
@@ -43,6 +47,10 @@ export class MethodContracts {
   }
 }
 
-interface IContracts {
+export interface IContract {
   pre: Array<() => void>;
+}
+
+export interface IContracts {
+  [key: string]: IContract;
 }

@@ -23,7 +23,7 @@
 //
 //
 
-import { MethodContracts } from "../contracts";
+import { IContract, IContracts, MethodContracts } from "../contracts";
 
 describe("Unit Tests: contracts", () => {
   // >>> BASE CLASS >>>
@@ -74,6 +74,25 @@ describe("Unit Tests: contracts", () => {
         expect(mockResult).toBe(descriptor);
       });
     });
+
+    // ~~~ Contract ~~~
+    describe("the contract decorator", () => {
+      it("should throw for the first precondition", () => {
+        const contractDefinitions = {
+          aRandomKey: {
+            pre: [
+              () => {
+                throw new Error();
+              },
+            ],
+          },
+        };
+        const TestClass = testClassFactory("aRandomKey", contractDefinitions);
+        expect(() => {
+          new TestClass().testMethod();
+        }).toThrow();
+      });
+    });
   });
 });
 
@@ -98,11 +117,24 @@ const decoratorFactory = (
   return () => func(target, key, descriptor);
 };
 
+/**
+ * Make a TestClass whose testMethod() is decorated with the passed in contracts - or with sensible
+ *  defaults.
+ * @param contractKey - a string that points to a key in the contractDefinitions.
+ * @param contractDefinitions - an object that  follows the IContracts interface, and contains the
+ *  actionable predicates.
+ * @returns a TestClass, ready to be instantiated. No constructor args necessary.
+ * @example const TestClass = testClassFactory("aKey", contractDefinitions)
+ * @example new TestClass().testMethod(param?)
+ */
 // +++ test class +++
-const testClassFactory = (contract = "testContractKey"): any => {
-  const contracts = methodContractsFactory().factory;
+const testClassFactory = (
+  contractKey: string = "testContractKey",
+  contractDefinitions: IContracts = mockContracts,
+): any => {
+  const contracts = methodContractsFactory(contractDefinitions).factory;
   class TestClass {
-    @contracts(contract)
+    @contracts(contractKey)
     public testMethod(param: any) {
       return param;
     }
@@ -111,11 +143,13 @@ const testClassFactory = (contract = "testContractKey"): any => {
 };
 
 // +++ class +++
-const methodContractsFactory = (contracts = mockContracts) => {
+const methodContractsFactory = (contracts: IContracts = mockContracts) => {
   return new MethodContracts(contracts);
 };
 
 // ~~~ Mocks ~~~
 const mockContracts = {
-  pre: [() => undefined],
+  testContractKey: {
+    pre: [() => undefined],
+  },
 };
