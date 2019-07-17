@@ -46,6 +46,7 @@ describe("Unit Tests: contracts", () => {
             return param;
           }
         }
+        expect(new TestClass()).toBeDefined();
       });
 
       it("should return a function", () => {
