@@ -23,8 +23,10 @@
 //
 //
 export class MethodContracts {
-  public enforce(target: object, key: string, descriptor: TypedPropertyDescriptor<any>) {
-    // console.log("Hello Decorator");
-    return descriptor;
+  public factory() {
+    return function enforce(target: object, key: string, descriptor: TypedPropertyDescriptor<any>) {
+      // console.log("Hello Decorator");
+      return descriptor;
+    };
   }
 }

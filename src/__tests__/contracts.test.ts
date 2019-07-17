@@ -31,10 +31,15 @@ describe("Unit Tests: contracts", () => {
       expect(contracts).toBeDefined();
     });
 
-    it("should have a defined enforce method that can be called", () => {
+    it("should have a defined decorator factory method that can be called", () => {
       const contracts = new MethodContracts();
-      expect(contracts.enforce).toBeDefined();
-      expect(contracts.enforce).not.toThrow();
+      expect(contracts.factory).toBeDefined();
+      expect(contracts.factory).not.toThrow();
+    });
+
+    it("should return a function from the decorator factory", () => {
+      const contracts = new MethodContracts();
+      expect(typeof contracts.factory()).toBe("function");
     });
   });
 });
