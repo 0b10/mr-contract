@@ -77,20 +77,45 @@ describe("Unit Tests: contracts", () => {
 
     // ~~~ Contract ~~~
     describe("the contract decorator", () => {
-      it("should throw for the first precondition", () => {
-        const contractDefinitions = {
-          aRandomKey: {
-            pre: [
-              () => {
-                throw new Error();
-              },
-            ],
+      [
+        [
+          () => {
+            throw new Error();
           },
-        };
-        const TestClass = testClassFactory("aRandomKey", contractDefinitions);
-        expect(() => {
-          new TestClass().testMethod();
-        }).toThrow();
+        ],
+        [
+          () => undefined,
+          () => {
+            throw new Error();
+          },
+        ],
+        [
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => {
+            throw new Error();
+          },
+        ],
+        // +++ parse all preconditions +++
+      ].forEach((contractsArray) => {
+        it(`should throw for precondition number ${contractsArray.length}`, () => {
+          const contractDefinitions = {
+            aRandomKey: {
+              pre: contractsArray,
+            },
+          };
+          const TestClass = testClassFactory("aRandomKey", contractDefinitions);
+          expect(() => {
+            new TestClass().testMethod();
+          }).toThrow();
+        });
       });
     });
   });
