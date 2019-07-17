@@ -27,19 +27,19 @@ import { MethodContracts } from "../contracts";
 describe("Unit Tests: contracts", () => {
   describe("MethodContracts", () => {
     it("should be importable and usable", () => {
-      const contracts = new MethodContracts();
+      const contracts = methodContractsFactory();
       expect(contracts).toBeDefined();
     });
 
     describe("the decorator factory", () => {
       it("should be defined and can be called", () => {
-        const contracts = new MethodContracts();
+        const contracts = methodContractsFactory();
         expect(contracts.factory).toBeDefined();
         expect(contracts.factory).not.toThrow();
       });
 
       it("should accept a string argument", () => {
-        const contracts = new MethodContracts().factory;
+        const contracts = methodContractsFactory().factory;
         class TestClass {
           @contracts("testContractKey")
           public testMethod(param: any) {
@@ -49,14 +49,14 @@ describe("Unit Tests: contracts", () => {
       });
 
       it("should return a function", () => {
-        const contracts = new MethodContracts();
+        const contracts = methodContractsFactory();
         expect(typeof contracts.factory("testContractKey")).toBe("function");
       });
     });
 
     describe("the decorator function", () => {
       it("should return the descriptor passed into the factory", () => {
-        const concreteDecFactory = new MethodContracts().factory("testContractKey");
+        const concreteDecFactory = methodContractsFactory().factory("testContractKey");
         const descriptor = {};
         const decorator = decoratorFactory(concreteDecFactory, undefined, undefined, descriptor);
         expect(decorator()).toBe(descriptor);
@@ -91,7 +91,7 @@ const decoratorFactory = (
 };
 
 const testClassFactory = (contract = "testContractKey"): any => {
-  const contracts = new MethodContracts().factory;
+  const contracts = methodContractsFactory().factory;
   class TestClass {
     @contracts(contract)
     public testMethod(param: any) {
@@ -99,6 +99,10 @@ const testClassFactory = (contract = "testContractKey"): any => {
     }
   }
   return TestClass;
+};
+
+const methodContractsFactory = (contracts = mockContracts) => {
+  return new MethodContracts(contracts);
 };
 
 const mockContracts = {

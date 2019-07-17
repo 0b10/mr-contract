@@ -24,7 +24,7 @@
 //
 
 export class MethodContracts {
-  constructor() {
+  constructor(private contracts: IContracts) {
     this.factory = this.factory.bind(this);
   }
 
