@@ -38,6 +38,7 @@ export class MethodContracts {
 
         contracts.pre.forEach((contract) => contract());
         const result = wrapped.apply(this, args);
+        contracts.post.forEach((contract) => contract());
 
         return result;
       };
@@ -48,6 +49,7 @@ export class MethodContracts {
 }
 
 export interface IContract {
+  post: Array<() => void>;
   pre: Array<() => void>;
 }
 

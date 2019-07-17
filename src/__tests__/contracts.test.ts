@@ -108,7 +108,50 @@ describe("Unit Tests: contracts", () => {
         it(`should throw for precondition number ${contractsArray.length}`, () => {
           const contractDefinitions = {
             aRandomKey: {
+              post: [() => undefined],
               pre: contractsArray,
+            },
+          };
+          const TestClass = testClassFactory("aRandomKey", contractDefinitions);
+          expect(() => {
+            new TestClass().testMethod();
+          }).toThrow();
+        });
+      });
+
+      [
+        [
+          () => {
+            throw new Error();
+          },
+        ],
+        [
+          () => undefined,
+          () => {
+            throw new Error();
+          },
+        ],
+        [
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => undefined,
+          () => {
+            throw new Error();
+          },
+        ],
+        // +++ parse all postconditions +++
+      ].forEach((contractsArray) => {
+        it(`should throw for postcondition number ${contractsArray.length}`, () => {
+          const contractDefinitions = {
+            aRandomKey: {
+              post: contractsArray,
+              pre: [() => undefined],
             },
           };
           const TestClass = testClassFactory("aRandomKey", contractDefinitions);
@@ -175,6 +218,7 @@ const methodContractsFactory = (contracts: IContracts = mockContracts) => {
 // ~~~ Mocks ~~~
 const mockContracts = {
   testContractKey: {
+    post: [() => undefined],
     pre: [() => undefined],
   },
 };
