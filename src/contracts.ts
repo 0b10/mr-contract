@@ -22,12 +22,14 @@
 // SOFTWARE.
 //
 //
+
 export class MethodContracts {
   constructor() {
     this.factory = this.factory.bind(this);
   }
 
-  public factory() {
+  // TODO: do assertion test for key presence
+  public factory(contractKey: string) {
     return (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {
       const wrapped = descriptor.value;
 
@@ -39,4 +41,8 @@ export class MethodContracts {
       return descriptor;
     };
   }
+}
+
+interface IContracts {
+  pre: Array<() => void>;
 }

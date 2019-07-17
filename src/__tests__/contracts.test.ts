@@ -38,28 +38,32 @@ describe("Unit Tests: contracts", () => {
         expect(contracts.factory).not.toThrow();
       });
 
+      it("should accept a string argument", () => {
+        const contracts = new MethodContracts().factory;
+        class TestClass {
+          @contracts("testContractKey")
+          public testMethod(param: any) {
+            return param;
+          }
+        }
+      });
+
       it("should return a function", () => {
         const contracts = new MethodContracts();
-        expect(typeof contracts.factory()).toBe("function");
+        expect(typeof contracts.factory("testContractKey")).toBe("function");
       });
     });
 
     describe("the decorator function", () => {
       it("should return the descriptor passed into the factory", () => {
-        const concreteDecFactory = new MethodContracts().factory();
+        const concreteDecFactory = new MethodContracts().factory("testContractKey");
         const descriptor = {};
         const decorator = decoratorFactory(concreteDecFactory, undefined, undefined, descriptor);
         expect(decorator()).toBe(descriptor);
       });
 
       it("should return the same value as the decorated method", () => {
-        const contracts = new MethodContracts().factory;
-        class TestClass {
-          @contracts()
-          public testMethod(param: any) {
-            return param;
-          }
-        }
+        const TestClass = testClassFactory();
         const descriptor = {};
         const mockResult = new TestClass().testMethod(descriptor);
         expect(mockResult).toBe(descriptor);
@@ -84,4 +88,19 @@ const decoratorFactory = (
   descriptor: TypedPropertyDescriptor<any> = {},
 ) => {
   return () => func(target, key, descriptor);
+};
+
+const testClassFactory = (contract = "testContractKey"): any => {
+  const contracts = new MethodContracts().factory;
+  class TestClass {
+    @contracts(contract)
+    public testMethod(param: any) {
+      return param;
+    }
+  }
+  return TestClass;
+};
+
+const mockContracts = {
+  pre: [() => undefined],
 };
