@@ -23,9 +23,19 @@
 //
 //
 export class MethodContracts {
+  constructor() {
+    this.factory = this.factory.bind(this);
+  }
+
   public factory() {
-    return function enforce(target: object, key: string, descriptor: TypedPropertyDescriptor<any>) {
-      // console.log("Hello Decorator");
+    return (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {
+      const wrapped = descriptor.value;
+
+      descriptor.value = (...args: any[]) => {
+        const result = wrapped.apply(this, args);
+        return result;
+      };
+
       return descriptor;
     };
   }

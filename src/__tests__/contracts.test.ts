@@ -51,16 +51,31 @@ describe("Unit Tests: contracts", () => {
         const decorator = decoratorFactory(concreteDecFactory, undefined, undefined, descriptor);
         expect(decorator()).toBe(descriptor);
       });
+
+      it("should return the same value as the decorated method", () => {
+        const contracts = new MethodContracts().factory;
+        class TestClass {
+          @contracts()
+          public testMethod(param: any) {
+            return param;
+          }
+        }
+        const descriptor = {};
+        const mockResult = new TestClass().testMethod(descriptor);
+        expect(mockResult).toBe(descriptor);
+      });
     });
   });
 });
 
 /**
  * Initialise the decorator with injected values. Has sensible defaults.
- * @param {function} func - A reference to the concrete decorator factory (wrapper method).
- * @param {Object} target - A target object passed to the concrete decorator factory
- * @param {string} key - A key (func name) passed to the concrete decorator factory
- * @param {TypedPropertyDescriptor} descriptor  - A descriptor object passed to the concrete decorator factory
+ * @param func - A reference to the concrete decorator factory (wrapper method).
+ * @param target - A target object passed to the concrete decorator factory
+ * @param key - A key (func name) passed to the concrete decorator factory
+ * @param descriptor - A descriptor object passed to the concrete decorator factory
+ * @example decoratorFactory(fn, {}, "", {})()
+ * @returns A function that wraps the decorator
  */
 const decoratorFactory = (
   func: (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {},
