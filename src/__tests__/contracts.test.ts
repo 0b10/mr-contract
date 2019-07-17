@@ -41,5 +41,11 @@ describe("Unit Tests: contracts", () => {
       const contracts = new MethodContracts();
       expect(typeof contracts.factory()).toBe("function");
     });
+
+    it("should return the descriptor", () => {
+      const decorator = new MethodContracts().factory();
+      const descriptor = {};
+      expect(decorator({}, "", descriptor)).toBe(descriptor);
+    });
   });
 });
