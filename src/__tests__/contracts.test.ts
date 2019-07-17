@@ -22,15 +22,18 @@
 // SOFTWARE.
 //
 //
+
 import { MethodContracts } from "../contracts";
 
 describe("Unit Tests: contracts", () => {
+  // >>> BASE CLASS >>>
   describe("MethodContracts", () => {
     it("should be importable and usable", () => {
       const contracts = methodContractsFactory();
       expect(contracts).toBeDefined();
     });
 
+    // ~~~ Decorator Factory (method) ~~~
     describe("the decorator factory", () => {
       it("should be defined and can be called", () => {
         const contracts = methodContractsFactory();
@@ -55,6 +58,7 @@ describe("Unit Tests: contracts", () => {
       });
     });
 
+    // ~~~ Decorator ~~~
     describe("the decorator function", () => {
       it("should return the descriptor passed into the factory", () => {
         const concreteDecFactory = methodContractsFactory().factory("testContractKey");
@@ -73,6 +77,8 @@ describe("Unit Tests: contracts", () => {
   });
 });
 
+// >>> HELPERS >>>
+// ~~~ Factories ~~~
 /**
  * Initialise the decorator with injected values. Has sensible defaults.
  * @param func - A reference to the concrete decorator factory (wrapper method).
@@ -82,6 +88,7 @@ describe("Unit Tests: contracts", () => {
  * @example decoratorFactory(fn, {}, "", {})()
  * @returns A function that wraps the decorator
  */
+// +++ decorator +++
 const decoratorFactory = (
   func: (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {},
   target: object = {},
@@ -91,6 +98,7 @@ const decoratorFactory = (
   return () => func(target, key, descriptor);
 };
 
+// +++ test class +++
 const testClassFactory = (contract = "testContractKey"): any => {
   const contracts = methodContractsFactory().factory;
   class TestClass {
@@ -102,10 +110,12 @@ const testClassFactory = (contract = "testContractKey"): any => {
   return TestClass;
 };
 
+// +++ class +++
 const methodContractsFactory = (contracts = mockContracts) => {
   return new MethodContracts(contracts);
 };
 
+// ~~~ Mocks ~~~
 const mockContracts = {
   pre: [() => undefined],
 };
