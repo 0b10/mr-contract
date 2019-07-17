@@ -22,23 +22,28 @@
 // SOFTWARE.
 //
 //
+import { ContractKeyError } from "./error";
 
 export class MethodContracts {
   constructor(private contracts: IContracts) {
     this.factory = this.factory.bind(this);
   }
 
-  // TODO: do assertion test for key presence
   public factory(contractKey: string) {
+    if (!(contractKey in this.contracts)) {
+      throw new ContractKeyError(
+        `The given contract key does not exist in the contracts object: ${contractKey}`,
+      );
+    }
     return (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {
       const wrapped = descriptor.value;
 
       descriptor.value = (...args: any[]) => {
         const contracts: IContract = this.contracts[contractKey];
 
-        contracts.pre.forEach((contract) => contract());
+        contracts.pre.forEach((contract) => contract()); // Pre
         const result = wrapped.apply(this, args);
-        contracts.post.forEach((contract) => contract());
+        contracts.post.forEach((contract) => contract()); // Post
 
         return result;
       };

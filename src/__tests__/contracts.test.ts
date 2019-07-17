@@ -23,7 +23,8 @@
 //
 //
 
-import { IContract, IContracts, MethodContracts } from "../contracts";
+import { IContracts, MethodContracts } from "../contracts";
+import { ContractKeyError } from "../error";
 
 describe("Unit Tests: contracts", () => {
   // >>> BASE CLASS >>>
@@ -35,12 +36,14 @@ describe("Unit Tests: contracts", () => {
 
     // ~~~ Decorator Factory (method) ~~~
     describe("the decorator factory", () => {
-      it("should be defined and can be called", () => {
+      // +++ basic call +++
+      it("should be defined and be a function", () => {
         const contracts = methodContractsFactory();
         expect(contracts.factory).toBeDefined();
-        expect(contracts.factory).not.toThrow();
+        expect(typeof contracts.factory).toBe("function");
       });
 
+      // +++ factory arg +++
       it("should accept a string argument", () => {
         const contracts = methodContractsFactory().factory;
         class TestClass {
@@ -52,14 +55,22 @@ describe("Unit Tests: contracts", () => {
         expect(new TestClass()).toBeDefined();
       });
 
+      // +++ return value +++
       it("should return a function", () => {
         const contracts = methodContractsFactory();
         expect(typeof contracts.factory("testContractKey")).toBe("function");
+      });
+
+      // +++ invalid key +++
+      it("should throw when given an invalid contract key", () => {
+        const contracts = methodContractsFactory();
+        expect(() => contracts.factory("uqiwyeiuhadskjahsdwqu")).toThrow(ContractKeyError);
       });
     });
 
     // ~~~ Decorator ~~~
     describe("the decorator function", () => {
+      // FIXME: no longer necessary
       it("should return the descriptor passed into the factory", () => {
         const concreteDecFactory = methodContractsFactory().factory("testContractKey");
         const descriptor = {};
@@ -67,6 +78,7 @@ describe("Unit Tests: contracts", () => {
         expect(decorator()).toBe(descriptor);
       });
 
+      // +++ decorated method's return value +++
       it("should return the same value as the decorated method", () => {
         const TestClass = testClassFactory();
         const descriptor = {};
