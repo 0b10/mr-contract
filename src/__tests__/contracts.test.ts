@@ -31,22 +31,26 @@ describe("Unit Tests: contracts", () => {
       expect(contracts).toBeDefined();
     });
 
-    it("should have a defined decorator factory method that can be called", () => {
-      const contracts = new MethodContracts();
-      expect(contracts.factory).toBeDefined();
-      expect(contracts.factory).not.toThrow();
+    describe("the decorator factory", () => {
+      it("should be defined and can be called", () => {
+        const contracts = new MethodContracts();
+        expect(contracts.factory).toBeDefined();
+        expect(contracts.factory).not.toThrow();
+      });
+
+      it("should return a function", () => {
+        const contracts = new MethodContracts();
+        expect(typeof contracts.factory()).toBe("function");
+      });
     });
 
-    it("should return a function from the decorator factory", () => {
-      const contracts = new MethodContracts();
-      expect(typeof contracts.factory()).toBe("function");
-    });
-
-    it("should return the descriptor", () => {
-      const concreteDecFactory = new MethodContracts().factory();
-      const descriptor = {};
-      const decorator = decoratorFactory(concreteDecFactory, undefined, undefined, descriptor);
-      expect(decorator()).toBe(descriptor);
+    describe("the decorator function", () => {
+      it("should return the descriptor passed into the factory", () => {
+        const concreteDecFactory = new MethodContracts().factory();
+        const descriptor = {};
+        const decorator = decoratorFactory(concreteDecFactory, undefined, undefined, descriptor);
+        expect(decorator()).toBe(descriptor);
+      });
     });
   });
 });
