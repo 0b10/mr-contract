@@ -22,4 +22,3 @@
  * SOFTWARE.
  *
  */
-export { helloWorld } from './helloWorld';

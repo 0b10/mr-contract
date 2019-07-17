@@ -22,18 +22,9 @@
  * SOFTWARE.
  *
  */
-export const helloWorld = () => true
-
-function decorator(target: Object, key: string, descriptor: TypedPropertyDescriptor<any>) {
-    console.log("Hello Decorator")
-    return descriptor
+export class MethodContracts {
+  public enforce(target: object, key: string, descriptor: TypedPropertyDescriptor<any>) {
+    // console.log("Hello Decorator");
+    return descriptor;
+  }
 }
-
-class DecoratorTest {
-    @decorator
-    fn() {
-        return true;
-    }
-}
-
-new DecoratorTest().fn()

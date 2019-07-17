@@ -22,9 +22,19 @@
  * SOFTWARE.
  *
  */
+import { MethodContracts } from "../contracts";
 
-import { helloWorld } from "..";
+describe("Unit Tests: contracts", () => {
+  describe("MethodContracts", () => {
+    it("should be importable and usable", () => {
+      const contracts = new MethodContracts();
+      expect(contracts).toBeDefined();
+    });
 
-it("should pass", () => {
-  expect(helloWorld()).toBe(true);
+    it("should have a defined enforce method that can be called", () => {
+      const contracts = new MethodContracts();
+      expect(contracts.enforce).toBeDefined();
+      expect(contracts.enforce).not.toThrow();
+    });
+  });
 });
