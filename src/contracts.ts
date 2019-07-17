@@ -22,11 +22,15 @@
 // SOFTWARE.
 //
 //
+
 import { ContractKeyError } from "./error";
 
 export class MethodContracts {
   constructor(private contracts: IContracts) {
     this.factory = this.factory.bind(this);
+    this.getArgsObj = this.getArgsObj.bind(this);
+    this.getParamNames = this.getParamNames.bind(this);
+    this.zip = this.zip.bind(this);
   }
 
   public factory(contractKey: string) {
@@ -40,8 +44,9 @@ export class MethodContracts {
 
       descriptor.value = (...args: any[]) => {
         const contracts: IContract = this.contracts[contractKey];
+        const params = this.getArgsObj(wrapped, args);
 
-        contracts.pre.forEach((contract) => contract()); // Pre
+        contracts.pre.forEach((contract) => contract(params)); // Pre
         const result = wrapped.apply(this, args);
         contracts.post.forEach((contract) => contract()); // Post
 
@@ -51,13 +56,35 @@ export class MethodContracts {
       return descriptor;
     };
   }
+
+  private getParamNames(func: () => any): string[] | undefined {
+    const match = func.toString().match(/function\s.*?\(([^)]*)\)/);
+    return match ? match[1].replace(/ /g, "").split(",") : undefined; // match is null for 0 params
+  }
+
+  private zip(paramNames: string[], args: any[]): IParams {
+    const params: IParams = {};
+    paramNames.forEach((paramName: string, index: number) => {
+      params[paramName] = args[index];
+    });
+    return params;
+  }
+
+  private getArgsObj(func: () => any, args: any[]): IParams | undefined {
+    const params: string[] | undefined = this.getParamNames(func);
+    return params ? this.zip(params, args) : undefined;
+  }
 }
 
 export interface IContract {
-  post: Array<() => void>;
-  pre: Array<() => void>;
+  post: Array<(args?: object) => void>;
+  pre: Array<(args?: object) => void>;
 }
 
 export interface IContracts {
   [key: string]: IContract;
+}
+
+interface IParams {
+  [key: string]: any;
 }

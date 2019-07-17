@@ -23,6 +23,8 @@
 //
 //
 
+/* tslint:disable:max-classes-per-file */
+
 import { IContracts, MethodContracts } from "../contracts";
 import { ContractKeyError } from "../error";
 
@@ -160,7 +162,7 @@ describe("Unit Tests: contracts", () => {
         // +++ parse all postconditions +++
       ].forEach((contractsArray) => {
         it(`should throw for postcondition number ${contractsArray.length}`, () => {
-          const contractDefinitions = {
+          const contractDefinitions: IContracts = {
             aRandomKey: {
               post: contractsArray,
               pre: [() => undefined],
@@ -169,6 +171,33 @@ describe("Unit Tests: contracts", () => {
           const TestClass = testClassFactory("aRandomKey", contractDefinitions);
           expect(() => {
             new TestClass().testMethod();
+          }).toThrow();
+        });
+      });
+
+      [
+        // 0
+        {
+          arg: 1,
+          contractDefinitions: {
+            testContractKey: {
+              post: [() => undefined],
+              pre: [
+                (arg?: object) => {
+                  if (arg === {}) {
+                    throw Error();
+                  }
+                },
+              ],
+            },
+          },
+          type: "precondition",
+        },
+      ].forEach(({ arg, type, contractDefinitions }) => {
+        it(`should throw for ${type} when given an arg`, () => {
+          const TestClass = testClassFactory("testContractKey", contractDefinitions);
+          expect(() => {
+            new TestClass().testMethod(arg);
           }).toThrow();
         });
       });
