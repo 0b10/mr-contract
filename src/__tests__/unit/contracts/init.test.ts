@@ -28,7 +28,6 @@
 import { methodContractsFactory } from "./helpers";
 
 describe("Unit Tests: contracts", () => {
-  // >>> BASE CLASS >>>
   describe("MethodContracts", () => {
     it("should be importable and usable", () => {
       const contracts = methodContractsFactory();
