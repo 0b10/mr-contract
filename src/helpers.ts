@@ -22,3 +22,17 @@
 // SOFTWARE.
 //
 //
+
+import getParamsFactory from "mr-params";
+import { IContractArgs } from "./contracts";
+
+const getMrParams = getParamsFactory({ cache: true });
+
+// An adapter. Return falsy values as undefined (retval is used an arg, so undefined is desirable in some cases)
+export const getParams = (
+  funcRef: (...args: any[]) => any,
+  args: any[],
+): IContractArgs | undefined => {
+  const params = getMrParams(funcRef, args);
+  return params ? (params as IContractArgs) : undefined;
+};

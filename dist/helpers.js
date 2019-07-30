@@ -1,3 +1,4 @@
+"use strict";
 //
 // MIT License
 //
@@ -22,3 +23,14 @@
 // SOFTWARE.
 //
 //
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mr_params_1 = __importDefault(require("mr-params"));
+const getMrParams = mr_params_1.default({ cache: true });
+// An adapter. Return falsy values as undefined (retval is used an arg, so undefined is desirable in some cases)
+exports.getParams = (funcRef, args) => {
+    const params = getMrParams(funcRef, args);
+    return params ? params : undefined;
+};

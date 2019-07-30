@@ -22,3 +22,16 @@
 // SOFTWARE.
 //
 //
+
+import { testClassFactory } from "./helpers";
+
+describe("Unit Tests: contracts", () => {
+  describe("a decorated method", () => {
+    it("should return an expected value", () => {
+      const TestClass = testClassFactory();
+      const arg = {};
+      const mockResult = new TestClass().testMethod(arg);
+      expect(mockResult).toBe(arg);
+    });
+  });
+});

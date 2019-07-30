@@ -1,6 +1,5 @@
 build/
 coverage/
-dist/
 
 # Created by https://www.gitignore.io/api/vim,linux,visualstudiocode,node
 # Edit at https://www.gitignore.io/?templates=vim,linux,visualstudiocode,node
