@@ -24,7 +24,6 @@
 //
 //
 Object.defineProperty(exports, "__esModule", { value: true });
-const helpers_1 = require("./helpers");
 class MethodContracts {
     constructor(contractsTable) {
         this.contractsTable = contractsTable;
@@ -38,16 +37,16 @@ class MethodContracts {
             const wrappedFunc = descriptor.value;
             descriptor.value = (...args) => {
                 const contracts = this.contractsTable[contractKey];
-                const contractArgs = helpers_1.getParams(wrappedFunc, args);
+                // const contractArgs = getParams(wrappedFunc, args);
                 try {
-                    contracts.pre.forEach((contract) => contract(contractArgs));
+                    contracts.pre.forEach((contract) => contract(...args));
                 }
                 catch (e) {
                     throw new PreconditionError(e.message);
                 }
                 const result = wrappedFunc.apply(this, args);
                 try {
-                    contracts.post.forEach((contract) => contract(contractArgs, result));
+                    contracts.post.forEach((contract) => contract(result, ...args));
                 }
                 catch (e) {
                     throw new PostconditionError(e.message);

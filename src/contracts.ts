@@ -23,8 +23,6 @@
 //
 //
 
-import { getParams } from "./helpers";
-
 export class MethodContracts {
   constructor(private contractsTable: IContractsTable) {
     this.factory = this.factory.bind(this);
@@ -41,20 +39,19 @@ export class MethodContracts {
 
       descriptor.value = (...args: any[]) => {
         const contracts: IContracts = this.contractsTable[contractKey];
-        const contractArgs = getParams(wrappedFunc, args);
+        // const contractArgs = getParams(wrappedFunc, args);
 
         try {
-          contracts.pre.forEach((contract) => contract(contractArgs));
+          contracts.pre.forEach((contract) => contract(...args));
         } catch (e) {
           throw new PreconditionError(e.message);
         }
         const result = wrappedFunc.apply(this, args);
         try {
-          contracts.post.forEach((contract) => contract(contractArgs, result));
+          contracts.post.forEach((contract) => contract(result, ...args));
         } catch (e) {
           throw new PostconditionError(e.message);
         }
-
         return result;
       };
       return descriptor;
@@ -86,14 +83,6 @@ export class PreconditionError extends Error {
 
 // >>> INTERFACES >>>
 /**
- * An object that's passed to each contract. The contents of which are the arguments and values from the
- *  decorated method.
- */
-export interface IContractArgs {
-  [key: string]: any;
-}
-
-/**
  * The contracts - with pre and post keys each containing an array of callbacks, where each executes
  *  one or more predicates.
  * @example
@@ -103,8 +92,8 @@ export interface IContractArgs {
  * }
  */
 export interface IContracts {
-  pre: Array<(args: IContractArgs | undefined) => void>;
-  post: Array<(arg: IContractArgs | undefined, result: any) => void>;
+  pre: Array<(...args: any[]) => void>;
+  post: Array<(result: any, ...args: any[]) => void>;
 }
 
 /**

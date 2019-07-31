@@ -13,13 +13,6 @@ export declare class PreconditionError extends Error {
     constructor(message?: string);
 }
 /**
- * An object that's passed to each contract. The contents of which are the arguments and values from the
- *  decorated method.
- */
-export interface IContractArgs {
-    [key: string]: any;
-}
-/**
  * The contracts - with pre and post keys each containing an array of callbacks, where each executes
  *  one or more predicates.
  * @example
@@ -29,8 +22,8 @@ export interface IContractArgs {
  * }
  */
 export interface IContracts {
-    pre: Array<(args: IContractArgs | undefined) => void>;
-    post: Array<(arg: IContractArgs | undefined, result: any) => void>;
+    pre: Array<(...args: any[]) => void>;
+    post: Array<(result: any, ...args: any[]) => void>;
 }
 /**
  * A lookup table that contains a contracts [IContracts] object for each key.

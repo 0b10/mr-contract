@@ -24,6 +24,7 @@
 //
 
 /* tslint:disable:max-classes-per-file */
+/* tslint:disable:variable-name */
 
 import {
   IContractsTable,
@@ -50,10 +51,10 @@ export const contractErrorMsg = "fake-error-message";
  *    nullContractsBefore: 2, // How many "passing" contracts preceeds the above, failing contract
  *    result: false // controls the test description only. Use true when testing postcondition result
  *  }
- * ].forEach(testContractsArray);
+ * ].forEach(testContractsThrow);
  */
 // >>> TEST LOGIC >>>
-export const testContractsArray = (
+export const testContractsThrow = (
   {
     args,
     contract,
@@ -64,74 +65,124 @@ export const testContractsArray = (
   }: IContractsArrayTestData,
   caseNum?: number,
 ) => {
-  let num: string;
-  caseNum !== undefined ? (num = `(#${caseNum}): `) : (num = "");
-  describe(`${num}the given contract${args ? `, with ${args.length} args: ` + args : ""}`, () => {
-    // +++ test case description logic +++
-    // the result bool takes precedence - if result, the ignore args message
-    const argsMsg = args ? "conditionally react to the args and" : "";
-    const resultMsg = result ? "conditionally react to the result and" : "";
-    let conditionalMsg: string = "";
-    if (argsMsg || resultMsg) {
-      conditionalMsg = resultMsg ? resultMsg : argsMsg;
-    }
-    const message = `should ${conditionalMsg ? conditionalMsg : ""} throw a ${
-      contractsType === "precondition" ? PreconditionError.name : PostconditionError.name
-    } error @ contract #${nullContractsBefore + 1}`;
+  describe(
+    testContractsThrowDescTag`${caseNum}the given ${contractsType} contract @ position ${nullContractsBefore +
+      1}${args}`,
+    () => {
+      // +++ test case description logic +++
+      it(testContractsThrowItTag`should ${result}${args}${contractsType}`, () => {
+        const TestClass = initTestClass(
+          contract,
+          contractsType,
+          nullContractsAfter,
+          nullContractsBefore,
+        );
 
-    // +++ make contracts +++
-    it(message, () => {
-      let pre: ContractsArray;
-      let post: ContractsArray;
-      if (contractsType === "precondition") {
-        pre = makeContractsArray(contract, nullContractsAfter, nullContractsBefore);
-        post = [() => undefined];
-      } else if (contractsType === "postcondition") {
-        pre = [() => undefined];
-        post = makeContractsArray(contract, nullContractsAfter, nullContractsBefore);
-      } else {
-        throw new TypeError(`Invalid contracts type: ${contractsType}`);
-      }
+        _testContractsThrow(args, contractsType, TestClass);
+      });
+    },
+  );
+};
 
-      const contractDefinitions = {
-        aRandomKey: {
-          post,
-          pre,
-        },
-      };
-
-      // +++ determine expected error type +++
-      const TestClass = testClassFactory("aRandomKey", contractDefinitions);
-      let errorName: string;
-      contractsType === "precondition"
-        ? (errorName = PreconditionError.name)
-        : (errorName = PostconditionError.name);
-
-      // +++ do test +++
-      if (args && args.length > 0) {
-        // With args
-        try {
-          new TestClass().testMethod(...args);
-          expect("should throw").toBe("didn't throw"); // Didn't throw. Problem.
-        } catch (e) {
-          expect(e.name).toBe(errorName);
-          expect(e.message).toBe(contractErrorMsg);
-        }
-      } else {
-        // Without args
-        try {
-          new TestClass().testMethod();
-          expect("should throw").toBe("didn't throw"); // Didn't throw. Problem.
-        } catch (e) {
-          expect(e.name).toBe(errorName);
-          expect(e.message).toBe(contractErrorMsg);
-        }
-      }
+export const testContractsPass = (contractsType: string, caseNum?: number) => {
+  describe(`(#${caseNum}): the given, 'passing' ${contractsType} contract`, () => {
+    it("should not throw", () => {
+      const TestClass = initTestClass(() => undefined, contractsType);
+      _testContractsDontThrow(undefined, TestClass);
     });
   });
 };
 
+// >>> STRING TEMPLATES >>>
+const testContractsThrowDescTag = (
+  strings: TemplateStringsArray,
+  caseNumExpr: number | undefined,
+  contractsTypeExp: string,
+  contractPosExpr: number,
+  argsExpr: any[] | undefined,
+): string => {
+  let caseNum: string;
+  let args: string;
+  caseNumExpr !== undefined ? (caseNum = `(#${caseNumExpr}): `) : (caseNum = "");
+  argsExpr ? (args = `, with ${argsExpr.length} args: ` + argsExpr) : (args = "");
+
+  return `${caseNum}${strings[1]}${contractsTypeExp}${strings[2]}${contractPosExpr}${
+    strings[3]
+  }${args}`;
+};
+
+const testContractsThrowItTag = (
+  strings: TemplateStringsArray,
+  resultExpr: boolean | undefined,
+  argsExpr: any[] | undefined,
+  contractsType: string,
+): string => {
+  // resultMsg takes precedence. if result is true, no message about args is printed.
+  const argsMsg = argsExpr ? "conditionally react to the args and " : "";
+  const resultMsg = resultExpr ? "conditionally react to the result and " : "";
+
+  let conditionalMsg: string = "";
+  if (argsMsg || resultMsg) {
+    conditionalMsg = resultMsg ? resultMsg : argsMsg;
+  }
+
+  const throwsMsg = `throw a ${
+    contractsType === "precondition" ? PreconditionError.name : PostconditionError.name
+  }`;
+
+  return `${strings[0]}${conditionalMsg ? conditionalMsg : ""}${throwsMsg}`;
+};
+
 // >>> HELPERS >>>
+const _testContractsThrow = (args: any[] | undefined, contractsType: string, TestClass: any) => {
+  // +++ determine expected error type +++
+  let errorName: string;
+  contractsType === "precondition"
+    ? (errorName = PreconditionError.name)
+    : (errorName = PostconditionError.name);
+
+  // +++ do test +++
+  if (args && args.length > 0) {
+    // With args
+    try {
+      new TestClass().testMethod(...args);
+      expect("should throw").toBe("didn't throw"); // Didn't throw. Problem.
+    } catch (e) {
+      expect(e.name).toBe(errorName);
+      expect(e.message).toBe(contractErrorMsg);
+    }
+  } else {
+    // Without args
+    try {
+      new TestClass().testMethod();
+      expect("should throw").toBe("didn't throw"); // Didn't throw. Problem.
+    } catch (e) {
+      expect(e.name).toBe(errorName);
+      expect(e.message).toBe(contractErrorMsg);
+    }
+  }
+};
+
+const _testContractsDontThrow = (args: any[] | undefined, TestClass: any) => {
+  if (args && args.length > 0) {
+    // With args
+    try {
+      new TestClass().testMethod(...args);
+    } catch (e) {
+      expect("shouldn't throw").toBe("did throw");
+      console.error({ e });
+    }
+  } else {
+    // Without args
+    try {
+      new TestClass().testMethod();
+    } catch (e) {
+      expect("shouldn't throw").toBe("did throw");
+      console.error({ e });
+    }
+  }
+};
+
 const makeContractsArray = (
   contract: ContractFunc,
   nullContractsAfter: number,
@@ -140,6 +191,33 @@ const makeContractsArray = (
   const length = nullContractsAfter + nullContractsBefore + 1;
   const target = nullContractsBefore; // ! don't do off by one
   return [...Array(length)].map((_, index) => (index === target ? contract : () => undefined));
+};
+
+const initTestClass = (
+  contract: (...args: any[]) => void,
+  contractsType: string,
+  nullContractsAfter = 0,
+  nullContractsBefore = 0,
+) => {
+  let pre: ContractsArray;
+  let post: ContractsArray;
+  if (contractsType === "precondition") {
+    pre = makeContractsArray(contract, nullContractsAfter, nullContractsBefore);
+    post = [() => undefined];
+  } else if (contractsType === "postcondition") {
+    pre = [() => undefined];
+    post = makeContractsArray(contract, nullContractsAfter, nullContractsBefore);
+  } else {
+    throw new TypeError(`Invalid contracts type: ${contractsType}`);
+  }
+
+  const contractDefinitions = {
+    aRandomKey: {
+      post,
+      pre,
+    },
+  };
+  return testClassFactory("aRandomKey", contractDefinitions);
 };
 
 //  >>> FACTORIES >>>
@@ -176,8 +254,8 @@ export const testClassFactory = (
   const contracts = methodContractsFactory(contractsTable).factory;
   class TestClass {
     @contracts(contractKey)
-    public testMethod(param0: any, param1: any, param2: any, param3: any, param4: any) {
-      return param0;
+    public testMethod(...args: any[]) {
+      return args[0];
     }
   }
   return TestClass;
