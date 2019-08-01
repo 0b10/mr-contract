@@ -23,3 +23,43 @@
 // SOFTWARE.
 //
 //
+Object.defineProperty(exports, "__esModule", { value: true });
+const contracts_1 = require("./contracts");
+exports.MethodContracts = contracts_1.MethodContracts;
+/**
+ * A factory that initialises a contracts table, and returns a decorator factory. Use the decorator factory
+ *  to wrap a method,  while passing in a contract key to execute the desired contracts.
+ *
+ * The final product can be exported from a module, if you wish to have a global contracts table, or per
+ *  module, if you wish to namespace it per module.
+ *
+ * @param contractsTable - A table that contains all contracts, each set contained within it's related key.
+ * @example
+ * const contracts = contractsFactory(
+ *  {
+ *    myContractKey: {
+ *      pre: [(...args) => "contract"],
+ *      post: [(...args) => "contract"]
+ *    },
+ *    anotherContractKey: {
+ *      pre: [(...args) => "contract", (...args) => "contract"],
+ *      post: [(...args) => "contract"]
+ *    }
+ *  }
+ * )
+ *
+ * //...
+ *
+ * -at-contracts("myContractKey")
+ * myMethod(foo, bar, baz) {
+ *  // code
+ * };
+ */
+exports.contractsFactory = (contractsTable) => {
+    const contracts = new contracts_1.MethodContracts(contractsTable);
+    return contracts.factory;
+};
+var contracts_2 = require("./contracts");
+exports.ContractKeyError = contracts_2.ContractKeyError;
+exports.PostconditionError = contracts_2.PostconditionError;
+exports.PreconditionError = contracts_2.PreconditionError;

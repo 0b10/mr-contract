@@ -1,6 +1,6 @@
 {
   "name": "mr-contract",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Javascript DbC based on experimental decorators",
   "main": "dist/index.js",
   "dependencies": {
