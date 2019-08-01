@@ -253,8 +253,15 @@ export const testClassFactory = (
 ): any => {
   const contracts = methodContractsFactory(contractsTable).factory;
   class TestClass {
+    private realContextProp = true;
+    constructor() {
+      this.testMethod = this.testMethod.bind(this);
+    }
     @contracts(contractKey)
     public testMethod(...args: any[]) {
+      if (this.realContextProp !== true) {
+        throw Error("The execution context of the wrapped method is invalid");
+      }
       return args[0];
     }
   }

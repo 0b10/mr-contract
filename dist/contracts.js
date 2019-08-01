@@ -35,8 +35,10 @@ class MethodContracts {
         }
         return (target, key, descriptor) => {
             const wrappedFunc = descriptor.value;
-            descriptor.value = (...args) => {
-                const contracts = this.contractsTable[contractKey];
+            const contractsTable = this.contractsTable; // Cannot reference this inside descriptor value.
+            // ! Use func expression to preserve exectution context to that of the descriptor.
+            descriptor.value = function (...args) {
+                const contracts = contractsTable[contractKey];
                 // const contractArgs = getParams(wrappedFunc, args);
                 try {
                     contracts.pre.forEach((contract) => contract(...args));

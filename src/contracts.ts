@@ -36,9 +36,11 @@ export class MethodContracts {
     }
     return (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {
       const wrappedFunc = descriptor.value;
+      const contractsTable = this.contractsTable; // Cannot reference this inside descriptor value.
 
-      descriptor.value = (...args: any[]) => {
-        const contracts: IContracts = this.contractsTable[contractKey];
+      // ! Use func expression to preserve exectution context to that of the descriptor.
+      descriptor.value = function(...args: any[]) {
+        const contracts: IContracts = contractsTable[contractKey];
         // const contractArgs = getParams(wrappedFunc, args);
 
         try {
