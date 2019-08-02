@@ -26,10 +26,22 @@
 import assert from "assert";
 import { contractsFactory, IContractsTable, PostconditionError, PreconditionError } from "../../..";
 
+const { NODE_ENV: ORIGINAL_NODE_ENV } = process.env;
+if (ORIGINAL_NODE_ENV !== "test") {
+  // Fix me if not - it's not a bit deal, nothing should break. Just make sure the NODE_ENV is being
+  //  correctly reset between tests.
+  console.warn(`The NODE_ENV isn't set to 'test', this may be an error: ${ORIGINAL_NODE_ENV}`);
+}
+
 // >>> TEST LOGIC >>>
-export const testPassingContracts = ({ args, name, method }: IPassingContractsTestData) => {
+export const testPassingContracts = ({
+  args,
+  disabled = false,
+  name,
+  method,
+}: IPassingContractsTestData) => {
   describe(`the ${name} method, given the args: ${args}`, () => {
-    it("should pass all passable contracts", () => {
+    it(`should ${disabled ? "not execute any contracts" : "pass all passable contracts"}`, () => {
       expect(() => {
         method(...args);
       }).not.toThrow();
@@ -66,8 +78,45 @@ export const testFailingContracts = ({
 };
 
 // >>> FACTORIES >>>
-export const testClassFactory = (passOrFail: string) =>
-  passOrFail === "pass" ? new TestClassPass() : new TestClassFail();
+export const testClassFactory = (passOrFail: string, nodeEnv?: string, enabledFor?: string[]) => {
+  if (nodeEnv) {
+    process.env.NODE_ENV = nodeEnv;
+  } else {
+    // Just make sure the NODE_ENV is what it's supposed to be
+    const { NODE_ENV } = process.env;
+    assert(
+      NODE_ENV === ORIGINAL_NODE_ENV,
+      `the NODE_ENV has been modified, and not changed back to '${ORIGINAL_NODE_ENV}': '${NODE_ENV}'`,
+    ); // change at your discretion
+  }
+
+  let contracts: (contractsKey: string) => any;
+  passOrFail === "pass"
+    ? (contracts = contractsFactory(passingContractsTable, enabledFor))
+    : (contracts = contractsFactory(failingContractsTable, enabledFor));
+
+  class TestClass {
+    private executionContextProp: string;
+    constructor() {
+      this.executionContextProp = "exists";
+      this.add = this.add.bind(this);
+      this.concat = this.concat.bind(this);
+      this.getExecutionContextProp = this.getExecutionContextProp.bind(this);
+    }
+    @contracts("add")
+    public add(num1?: any, num2?: any) {
+      return (num1! + num2!) as number;
+    }
+    @contracts("concat")
+    public concat(str1?: any, str2?: any) {
+      return (str1! + str2!) as string;
+    }
+    public getExecutionContextProp() {
+      return this.executionContextProp;
+    }
+  }
+  return new TestClass();
+};
 
 // >>> MOCKS >>>
 const passingContractsTable: IContractsTable = {
@@ -119,54 +168,10 @@ const failingContractsTable: IContractsTable = {
   },
 };
 
-const passingContracts = contractsFactory(passingContractsTable);
-const failingContracts = contractsFactory(failingContractsTable);
-
-class TestClassPass {
-  private executionContextProp: string;
-  constructor() {
-    this.executionContextProp = "exists";
-    this.add = this.add.bind(this);
-    this.concat = this.concat.bind(this);
-    this.getExecutionContextProp = this.getExecutionContextProp.bind(this);
-  }
-  @passingContracts("add")
-  public add(num1?: any, num2?: any) {
-    return (num1! + num2!) as number;
-  }
-  @passingContracts("concat")
-  public concat(str1?: any, str2?: any) {
-    return (str1! + str2!) as string;
-  }
-  public getExecutionContextProp() {
-    return this.executionContextProp;
-  }
-}
-
-class TestClassFail {
-  private executionContextProp: string;
-  constructor() {
-    this.executionContextProp = "exists";
-    this.add = this.add.bind(this);
-    this.concat = this.concat.bind(this);
-    this.getExecutionContextProp = this.getExecutionContextProp.bind(this);
-  }
-  @failingContracts("add")
-  public add(num1?: any, num2?: any) {
-    return (num1! + num2!) as number;
-  }
-  @failingContracts("concat")
-  public concat(str1?: any, str2?: any) {
-    return (str1! + str2!) as string;
-  }
-  public getExecutionContextProp() {
-    return this.executionContextProp;
-  }
-}
-
 // >>> INTERFACES >>>
 interface IPassingContractsTestData {
   args: any[];
+  disabled?: boolean;
   name: string;
   method: (...args: any[]) => any;
 }

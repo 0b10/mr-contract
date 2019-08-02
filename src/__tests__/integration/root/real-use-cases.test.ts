@@ -25,8 +25,14 @@
 
 import { testClassFactory, testFailingContracts, testPassingContracts } from "./helpers";
 
+const origNodeEnv = process.env.NODE_ENV;
+
 describe("Integration Tests: root", () => {
   describe("real use cases", () => {
+    afterEach(() => (process.env.NODE_ENV = origNodeEnv));
+    beforeEach(() => (process.env.NODE_ENV = origNodeEnv));
+
+    // >>> PASS >>>
     describe(">>> passing", () => {
       [
         // #0 - add
@@ -44,6 +50,7 @@ describe("Integration Tests: root", () => {
       ].forEach(testPassingContracts);
     });
 
+    // >>> FAIL >>>
     describe(">>> failing", () => {
       [
         // #0 - add
@@ -58,6 +65,47 @@ describe("Integration Tests: root", () => {
           args: ["foo", "bar"],
           contractsType: "postcondition", // See contract spec - this case throws for postcondition
           method: testClassFactory("fail").concat,
+          name: "concat",
+        },
+      ].forEach(testFailingContracts);
+    });
+
+    // >>> DISABLED >>>
+    describe(">>> disabled through NODE_ENV", () => {
+      // * disable contracts, and deliberately use contracts that fail - should not throw
+      [
+        // #0 - add
+        {
+          args: [1, 2],
+          disabled: true,
+          method: testClassFactory("fail", "production").add,
+          name: "add",
+        },
+        // #1 concat
+        {
+          args: ["foo", "bar"],
+          disabled: true,
+          method: testClassFactory("fail", "production").concat,
+          name: "concat",
+        },
+      ].forEach(testPassingContracts);
+    });
+
+    // >>> ENABLED: CUSTOM ENV >>>
+    describe(">>> enabled for custom NODE_ENV", () => {
+      [
+        // #0 - add
+        {
+          args: [1, 2],
+          contractsType: "precondition", // See contract spec - this case throws for precondition
+          method: testClassFactory("fail", "custom-env", ["custom-env"]).add,
+          name: "add",
+        },
+        // #1 concat
+        {
+          args: ["foo", "bar"],
+          contractsType: "postcondition", // See contract spec - this case throws for postcondition
+          method: testClassFactory("fail", "custom-env", ["custom-env"]).concat,
           name: "concat",
         },
       ].forEach(testFailingContracts);

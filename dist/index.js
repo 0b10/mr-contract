@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const contracts_1 = require("./contracts");
 //
 // MIT License
 //
@@ -23,9 +25,8 @@
 // SOFTWARE.
 //
 //
-Object.defineProperty(exports, "__esModule", { value: true });
-const contracts_1 = require("./contracts");
-exports.MethodContracts = contracts_1.MethodContracts;
+const contracts_2 = require("./contracts");
+exports.MethodContracts = contracts_2.MethodContracts;
 /**
  * A factory that initialises a contracts table, and returns a decorator factory. Use the decorator factory
  *  to wrap a method,  while passing in a contract key to execute the desired contracts.
@@ -34,6 +35,8 @@ exports.MethodContracts = contracts_1.MethodContracts;
  *  module, if you wish to namespace it per module.
  *
  * @param contractsTable - A table that contains all contracts, each set contained within it's related key.
+ * @param enabledFor - A list of NODE_END values to enable all contracts for. Defaults to:
+ *  ["debug", "debugging", "dev", "develop", "development", "test", "testing"]
  * @example
  * const contracts = contractsFactory(
  *  {
@@ -55,11 +58,18 @@ exports.MethodContracts = contracts_1.MethodContracts;
  *  // code
  * };
  */
-exports.contractsFactory = (contractsTable) => {
-    const contracts = new contracts_1.MethodContracts(contractsTable);
+exports.contractsFactory = (contractsTable, enabledFor = ["debug", "debugging", "dev", "develop", "development", "test", "testing"]) => {
+    let contracts;
+    if (isEnabled(enabledFor)) {
+        contracts = new contracts_2.MethodContracts(contractsTable);
+    }
+    else {
+        contracts = new contracts_1.NullMethodContracts();
+    }
     return contracts.factory;
 };
-var contracts_2 = require("./contracts");
-exports.ContractKeyError = contracts_2.ContractKeyError;
-exports.PostconditionError = contracts_2.PostconditionError;
-exports.PreconditionError = contracts_2.PreconditionError;
+const isEnabled = (envs) => envs.some((val) => val === process.env.NODE_ENV);
+var contracts_3 = require("./contracts");
+exports.ContractKeyError = contracts_3.ContractKeyError;
+exports.PostconditionError = contracts_3.PostconditionError;
+exports.PreconditionError = contracts_3.PreconditionError;

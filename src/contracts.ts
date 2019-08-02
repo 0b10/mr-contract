@@ -23,7 +23,7 @@
 //
 //
 
-export class MethodContracts {
+export class MethodContracts implements IContractsClass {
   constructor(private contractsTable: IContractsTable) {
     this.factory = this.factory.bind(this);
   }
@@ -59,6 +59,14 @@ export class MethodContracts {
       return descriptor;
     };
   }
+}
+
+export class NullMethodContracts implements IContractsClass {
+  // tslint:disable:no-empty
+  public factory(contractKey: string) {
+    return (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => {};
+  }
+  // tslint:enable:no-empty
 }
 
 // >>> ERRORS >>>
@@ -104,4 +112,10 @@ export interface IContracts {
  */
 export interface IContractsTable {
   [key: string]: IContracts;
+}
+
+export interface IContractsClass {
+  factory: (
+    contractsKey: string,
+  ) => (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => any;
 }

@@ -1,7 +1,10 @@
-export declare class MethodContracts {
+export declare class MethodContracts implements IContractsClass {
     private contractsTable;
     constructor(contractsTable: IContractsTable);
     factory(contractKey: string): (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => TypedPropertyDescriptor<any>;
+}
+export declare class NullMethodContracts implements IContractsClass {
+    factory(contractKey: string): (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => void;
 }
 export declare class ContractKeyError extends Error {
     constructor(message: string);
@@ -31,4 +34,7 @@ export interface IContracts {
  */
 export interface IContractsTable {
     [key: string]: IContracts;
+}
+export interface IContractsClass {
+    factory: (contractsKey: string) => (target: object, key: string, descriptor: TypedPropertyDescriptor<any>) => any;
 }

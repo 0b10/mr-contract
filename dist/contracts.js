@@ -60,6 +60,13 @@ class MethodContracts {
     }
 }
 exports.MethodContracts = MethodContracts;
+class NullMethodContracts {
+    // tslint:disable:no-empty
+    factory(contractKey) {
+        return (target, key, descriptor) => { };
+    }
+}
+exports.NullMethodContracts = NullMethodContracts;
 // >>> ERRORS >>>
 class ContractKeyError extends Error {
     constructor(message) {

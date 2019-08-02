@@ -7,6 +7,8 @@ import { IContractsTable, MethodContracts } from "./contracts";
  *  module, if you wish to namespace it per module.
  *
  * @param contractsTable - A table that contains all contracts, each set contained within it's related key.
+ * @param enabledFor - A list of NODE_END values to enable all contracts for. Defaults to:
+ *  ["debug", "debugging", "dev", "develop", "development", "test", "testing"]
  * @example
  * const contracts = contractsFactory(
  *  {
@@ -28,6 +30,6 @@ import { IContractsTable, MethodContracts } from "./contracts";
  *  // code
  * };
  */
-export declare const contractsFactory: (contractsTable: IContractsTable) => (contractsKey: string) => any;
+export declare const contractsFactory: (contractsTable: IContractsTable, enabledFor?: string[]) => (contractsKey: string) => any;
 export { MethodContracts, IContractsTable };
 export { IContracts, ContractKeyError, PostconditionError, PreconditionError } from "./contracts";

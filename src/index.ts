@@ -1,3 +1,4 @@
+import { NullMethodContracts } from "./contracts";
 //
 // MIT License
 //
@@ -23,16 +24,18 @@
 //
 //
 
-import { IContractsTable, MethodContracts } from "./contracts";
+import { IContractsClass, IContractsTable, MethodContracts } from "./contracts";
 
 /**
- * A factory that initialises a contracts table, and returns a decorator factory. Use the decorator factory
+ * A factory that accepts and stores a contracts table, and returns a decorator factory. Use the decorator factory
  *  to wrap a method,  while passing in a contract key to execute the desired contracts.
  *
  * The final product can be exported from a module, if you wish to have a global contracts table, or per
  *  module, if you wish to namespace it per module.
  *
  * @param contractsTable - A table that contains all contracts, each set contained within it's related key.
+ * @param enabledFor - An optional list of NODE_ENV values to enable all contracts for. Defaults to:
+ *  ["debug", "debugging", "dev", "develop", "development", "test", "testing"]
  * @example
  * const contracts = contractsFactory(
  *  {
@@ -44,7 +47,8 @@ import { IContractsTable, MethodContracts } from "./contracts";
  *      pre: [(...args) => "contract", (...args) => "contract"],
  *      post: [(...args) => "contract"]
  *    }
- *  }
+ *  },
+ *  ["my-node-env-value", "another-node-env-value"]
  * )
  *
  * //...
@@ -56,10 +60,18 @@ import { IContractsTable, MethodContracts } from "./contracts";
  */
 export const contractsFactory = (
   contractsTable: IContractsTable,
+  enabledFor = ["debug", "debugging", "dev", "develop", "development", "test", "testing"],
 ): ((contractsKey: string) => any) => {
-  const contracts = new MethodContracts(contractsTable);
+  let contracts: IContractsClass;
+  if (isEnabled(enabledFor)) {
+    contracts = new MethodContracts(contractsTable);
+  } else {
+    contracts = new NullMethodContracts();
+  }
   return contracts.factory;
 };
+
+const isEnabled = (envs: string[]) => envs.some((val) => val === process.env.NODE_ENV);
 
 export { MethodContracts, IContractsTable };
 
