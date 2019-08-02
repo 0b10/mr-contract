@@ -35,6 +35,7 @@ import {
 
 // >>> CONSTANTS >>>
 export const contractErrorMsg = "fake-error-message";
+const testContractKey = "aRandomKey";
 
 /**
  * Test that the contracts arrays are processed, and behave as excpected.
@@ -149,7 +150,7 @@ const _testContractsThrow = (args: any[] | undefined, contractsType: string, Tes
       expect("should throw").toBe("didn't throw"); // Didn't throw. Problem.
     } catch (e) {
       expect(e.name).toBe(errorName);
-      expect(e.message).toBe(contractErrorMsg);
+      expect(e.message).toBe(`<Contract key: ${testContractKey}> ${contractErrorMsg}`);
     }
   } else {
     // Without args
@@ -158,7 +159,7 @@ const _testContractsThrow = (args: any[] | undefined, contractsType: string, Tes
       expect("should throw").toBe("didn't throw"); // Didn't throw. Problem.
     } catch (e) {
       expect(e.name).toBe(errorName);
-      expect(e.message).toBe(contractErrorMsg);
+      expect(e.message).toBe(`<Contract key: ${testContractKey}> ${contractErrorMsg}`);
     }
   }
 };
@@ -212,12 +213,12 @@ const initTestClass = (
   }
 
   const contractDefinitions = {
-    aRandomKey: {
+    [testContractKey]: {
       post,
       pre,
     },
   };
-  return testClassFactory("aRandomKey", contractDefinitions);
+  return testClassFactory(testContractKey, contractDefinitions);
 };
 
 //  >>> FACTORIES >>>

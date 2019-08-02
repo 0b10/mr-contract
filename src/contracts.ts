@@ -46,13 +46,13 @@ export class MethodContracts implements IContractsClass {
         try {
           contracts.pre.forEach((contract) => contract(...args));
         } catch (e) {
-          throw new PreconditionError(e.message);
+          throw new PreconditionError(`<Contract key: ${contractKey}> ${e.message}`);
         }
         const result = wrappedFunc.apply(this, args);
         try {
           contracts.post.forEach((contract) => contract(result, ...args));
         } catch (e) {
-          throw new PostconditionError(e.message);
+          throw new PostconditionError(`<Contract key: ${contractKey}> ${e.message}`);
         }
         return result;
       };

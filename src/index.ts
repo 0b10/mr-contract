@@ -1,4 +1,3 @@
-import { NullMethodContracts } from "./contracts";
 //
 // MIT License
 //
@@ -24,7 +23,12 @@ import { NullMethodContracts } from "./contracts";
 //
 //
 
-import { IContractsClass, IContractsTable, MethodContracts } from "./contracts";
+import {
+  IContractsClass,
+  IContractsTable,
+  MethodContracts,
+  NullMethodContracts,
+} from "./contracts";
 
 /**
  * A factory that accepts and stores a contracts table, and returns a decorator factory. Use the decorator factory

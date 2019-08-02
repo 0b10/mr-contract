@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const contracts_1 = require("./contracts");
 //
 // MIT License
 //
@@ -25,17 +23,18 @@ const contracts_1 = require("./contracts");
 // SOFTWARE.
 //
 //
-const contracts_2 = require("./contracts");
-exports.MethodContracts = contracts_2.MethodContracts;
+Object.defineProperty(exports, "__esModule", { value: true });
+const contracts_1 = require("./contracts");
+exports.MethodContracts = contracts_1.MethodContracts;
 /**
- * A factory that initialises a contracts table, and returns a decorator factory. Use the decorator factory
+ * A factory that accepts and stores a contracts table, and returns a decorator factory. Use the decorator factory
  *  to wrap a method,  while passing in a contract key to execute the desired contracts.
  *
  * The final product can be exported from a module, if you wish to have a global contracts table, or per
  *  module, if you wish to namespace it per module.
  *
  * @param contractsTable - A table that contains all contracts, each set contained within it's related key.
- * @param enabledFor - A list of NODE_END values to enable all contracts for. Defaults to:
+ * @param enabledFor - An optional list of NODE_ENV values to enable all contracts for. Defaults to:
  *  ["debug", "debugging", "dev", "develop", "development", "test", "testing"]
  * @example
  * const contracts = contractsFactory(
@@ -48,7 +47,8 @@ exports.MethodContracts = contracts_2.MethodContracts;
  *      pre: [(...args) => "contract", (...args) => "contract"],
  *      post: [(...args) => "contract"]
  *    }
- *  }
+ *  },
+ *  ["my-node-env-value", "another-node-env-value"]
  * )
  *
  * //...
@@ -61,7 +61,7 @@ exports.MethodContracts = contracts_2.MethodContracts;
 exports.contractsFactory = (contractsTable, enabledFor = ["debug", "debugging", "dev", "develop", "development", "test", "testing"]) => {
     let contracts;
     if (isEnabled(enabledFor)) {
-        contracts = new contracts_2.MethodContracts(contractsTable);
+        contracts = new contracts_1.MethodContracts(contractsTable);
     }
     else {
         contracts = new contracts_1.NullMethodContracts();
@@ -69,7 +69,7 @@ exports.contractsFactory = (contractsTable, enabledFor = ["debug", "debugging", 
     return contracts.factory;
 };
 const isEnabled = (envs) => envs.some((val) => val === process.env.NODE_ENV);
-var contracts_3 = require("./contracts");
-exports.ContractKeyError = contracts_3.ContractKeyError;
-exports.PostconditionError = contracts_3.PostconditionError;
-exports.PreconditionError = contracts_3.PreconditionError;
+var contracts_2 = require("./contracts");
+exports.ContractKeyError = contracts_2.ContractKeyError;
+exports.PostconditionError = contracts_2.PostconditionError;
+exports.PreconditionError = contracts_2.PreconditionError;
