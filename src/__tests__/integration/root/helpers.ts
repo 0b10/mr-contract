@@ -96,12 +96,12 @@ export const testClassFactory = (passOrFail: string, nodeEnv?: string, enabledFo
     : (contracts = contractsFactory(failingContractsTable, enabledFor));
 
   class TestClass {
-    private executionContextProp: string;
+    private canaryProp: string;
     constructor() {
-      this.executionContextProp = "exists";
+      this.canaryProp = "TestClass";
       this.add = this.add.bind(this);
       this.concat = this.concat.bind(this);
-      this.getExecutionContextProp = this.getExecutionContextProp.bind(this);
+      this.canary = this.canary.bind(this);
     }
     @contracts("add")
     public add(num1?: any, num2?: any) {
@@ -111,8 +111,8 @@ export const testClassFactory = (passOrFail: string, nodeEnv?: string, enabledFo
     public concat(str1?: any, str2?: any) {
       return (str1! + str2!) as string;
     }
-    public getExecutionContextProp() {
-      return this.executionContextProp;
+    public canary() {
+      return this.canaryProp;
     }
   }
   return new TestClass();

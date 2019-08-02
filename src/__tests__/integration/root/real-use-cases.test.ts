@@ -32,6 +32,20 @@ describe("Integration Tests: root", () => {
     afterEach(() => (process.env.NODE_ENV = origNodeEnv));
     beforeEach(() => (process.env.NODE_ENV = origNodeEnv));
 
+    // >>> EXECUTION CONTEXT >>>
+    describe(">>> execution context", () => {
+      // Since there are different decorators for both enabled, anddisabled, test both.
+      [true, false].forEach((enabled) => {
+        describe(`when contracts are ${enabled ? "enabled" : "disabled"}`, () => {
+          it("should be that of the TestClass instance", () => {
+            expect(testClassFactory("pass", enabled ? undefined : "production").canary()).toBe(
+              "TestClass",
+            );
+          });
+        });
+      });
+    });
+
     // >>> PASS >>>
     describe(">>> passing", () => {
       [
